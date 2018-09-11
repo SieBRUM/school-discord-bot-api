@@ -40,31 +40,36 @@ namespace DiscordBotAPI.Controllers
             return Ok(user);
         }
 
-        [HttpPost]
-        public IHttpActionResult SetUser([FromBody]frontendGivePoints frontendUser)
+        [HttpGet]
+        [Route("api/highscore")]
+        public IHttpActionResult GetHighscore()
         {
-            var user = _database.Users.Where(x => x.DiscordId == frontendUser.Id).FirstOrDefault();
+            var users = _database.Users.OrderByDescending(x => x.Points).ToList();
+            users.OrderBy(x => x.Points);
+            users = users.GetRange(0, 5);
+
+            return Ok(users);
+        }
+
+        [HttpPost]
+        public IHttpActionResult SetUser([FromBody]User frontendUser)
+        {
+            var user = _database.Users.Where(x => x.DiscordId == frontendUser.DiscordId).FirstOrDefault();
 
             if (user == null)
             {
                 user = new User();
-                user.DiscordId = frontendUser.Id;
+                user.DiscordId = frontendUser.DiscordId;
                 user.Points = 250;
             }
             else
             {
-                user.Points += frontendUser.points;
+                user.Points += frontendUser.Points;
             }
 
             _database.Context.SaveChanges();
 
             return Ok(user);
         }
-    }
-
-    public class frontendGivePoints
-    {
-        public long Id;
-        public long points;
     }
 }

@@ -151,6 +151,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\Coinflip.cs" />
+    <Compile Include="Mapping\CoinflipResult.cs" />
     <Compile Include="Mapping\User.cs" />
     <Compile Include="Services\DatabaseServiceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

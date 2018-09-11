@@ -3,6 +3,7 @@ namespace DiscordBotAPI.Models
     using System.Data.Entity;
     using DiscordBotAPI.Mapping;
     using DiscordBotAPI.Services;
+    using TNSApi.Mapping;
 
     public class DatabaseServiceProvider : DbContext, IDatabaseServiceProvider
     {
@@ -24,6 +25,7 @@ namespace DiscordBotAPI.Models
         // All mapped classes
 
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Coinflip> Coinflips { get; set; }
 
         // Returns current DBContext
         public virtual DbContext Context
