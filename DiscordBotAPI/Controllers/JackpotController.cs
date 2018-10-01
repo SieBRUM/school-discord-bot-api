@@ -1,7 +1,6 @@
 ﻿using System.Web.Http;
 using DiscordBotAPI.Services;
 using System.Linq;
-using System;
 using TNSApi.Mapping;
 
 namespace TNSApi.Controllers
