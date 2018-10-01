@@ -146,13 +146,16 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityWebApiActivator.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\GambleController.cs" />
+    <Compile Include="Controllers\CoinflipController.cs" />
+    <Compile Include="Controllers\JackpotController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Mapping\Coinflip.cs" />
     <Compile Include="Mapping\CoinflipResult.cs" />
+    <Compile Include="Mapping\Donation.cs" />
+    <Compile Include="Mapping\Jackpot.cs" />
     <Compile Include="Mapping\User.cs" />
     <Compile Include="Services\DatabaseServiceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

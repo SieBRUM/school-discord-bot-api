@@ -6,11 +6,11 @@ using TNSApi.Mapping;
 
 namespace DiscordBotAPI.Controllers
 {
-    public class GambleController : ApiController
+    public class CoinflipController : ApiController
     {
         IDatabaseServiceProvider _database;
 
-        public GambleController(IDatabaseServiceProvider database)
+        public CoinflipController(IDatabaseServiceProvider database)
         {
             _database = database;
         }
@@ -41,6 +41,8 @@ namespace DiscordBotAPI.Controllers
             {
                 result.Result = CoinflipResults.Won;
                 user.Points += coinflipUser.User.Points;
+                user.BetsExecuted++;
+                user.BetsWon++;
                 _database.Context.SaveChanges();
                 result.User = user;
 
@@ -50,6 +52,8 @@ namespace DiscordBotAPI.Controllers
             {
                 result.Result = CoinflipResults.Lost;
                 user.Points -= coinflipUser.User.Points;
+                user.BetsExecuted++;
+                user.BetsLost++;
                 _database.Context.SaveChanges();
                 result.User = user;
 
@@ -128,6 +132,8 @@ namespace DiscordBotAPI.Controllers
             if (existingCoinFlip == null)
             {
                 // Error
+                _database.Context.Entry(existingCoinFlip).State = System.Data.Entity.EntityState.Detached;
+                existingCoinFlip = new Coinflip();
                 existingCoinFlip.Result = CoinflipVsResults.ChallengeDoesntExist;
                 existingCoinFlip.Challenger = challenger;
                 existingCoinFlip.Enemy = enemy;
@@ -155,6 +161,10 @@ namespace DiscordBotAPI.Controllers
                 existingCoinFlip.Result = CoinflipVsResults.ChallengerWon;
                 challenger.Points += existingCoinFlip.Points;
                 enemy.Points -= existingCoinFlip.Points;
+                challenger.BetsExecuted++;
+                enemy.BetsExecuted++;
+                challenger.BetsWon++;
+                enemy.BetsLost++;
 
                 _database.Coinflips.Remove(existingCoinFlip);
                 _database.Context.SaveChanges();
@@ -166,6 +176,10 @@ namespace DiscordBotAPI.Controllers
                 existingCoinFlip.Result = CoinflipVsResults.EnemyWon;
                 challenger.Points -= existingCoinFlip.Points;
                 enemy.Points += existingCoinFlip.Points;
+                challenger.BetsExecuted++;
+                enemy.BetsExecuted++;
+                challenger.BetsLost++;
+                enemy.BetsWon++;
 
                 _database.Coinflips.Remove(existingCoinFlip);
                 _database.Context.SaveChanges();
@@ -173,5 +187,40 @@ namespace DiscordBotAPI.Controllers
                 return Ok(existingCoinFlip);
             }
         }
-    }   
+
+        [Route("api/gamble/declinecoinflip")]
+        [HttpPost]
+        public IHttpActionResult DeclineCoinflip([FromBody]Coinflip coinflip)
+        {
+            var challenger = _database.Users.Where(x => x.DiscordId == coinflip.Challenger.DiscordId).FirstOrDefault();
+            var enemy = _database.Users.Where(x => x.DiscordId == coinflip.Enemy.DiscordId).FirstOrDefault();
+
+            if (challenger == null || enemy == null)
+            {
+                return BadRequest();
+            }
+
+            var existingCoinFlip = _database.Coinflips.Where(x => x.ChallengerId == challenger.Id && x.EnemyId == enemy.Id).FirstOrDefault();
+
+            if (existingCoinFlip == null)
+            {
+                // Error
+                existingCoinFlip = new Coinflip();
+                _database.Context.Entry(existingCoinFlip).State = System.Data.Entity.EntityState.Detached;
+                existingCoinFlip.Result = CoinflipVsResults.ChallengeDoesntExist;
+                existingCoinFlip.Challenger = challenger;
+                existingCoinFlip.Enemy = enemy;
+                return Ok(existingCoinFlip);
+            }
+
+            existingCoinFlip.Result = CoinflipVsResults.ChallengeDeclined;
+            existingCoinFlip.Challenger = challenger;
+            existingCoinFlip.Enemy = enemy;
+
+            _database.Coinflips.Remove(existingCoinFlip);
+            _database.Context.SaveChanges();
+
+            return Ok(existingCoinFlip);
+        }
+    }
 }

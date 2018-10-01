@@ -54,38 +54,38 @@ namespace DiscordBotAPI.Controllers
 
         [HttpPost]
         [Route("api/pay")]
-        public IHttpActionResult PayPerson([FromBody] Coinflip request)
+        public IHttpActionResult PayPerson([FromBody] Donation request)
         {
-            var donator = _database.Users.Where(x => x.DiscordId == request.Challenger.DiscordId).FirstOrDefault();
-            var receiver = _database.Users.Where(x => x.DiscordId == request.Enemy.DiscordId).FirstOrDefault();
+            var donator = _database.Users.Where(x => x.DiscordId == request.Donator.DiscordId).FirstOrDefault();
+            var receiver = _database.Users.Where(x => x.DiscordId == request.Receiver.DiscordId).FirstOrDefault();
 
             if(donator == null)
             {
-                request.Result = CoinflipVsResults.ChallengeDoesntExist;
+                request.Result = DonationResult.DonatorDoesntExist;
                 return Ok(request);
             }
 
             if (receiver == null)
             {
-                request.Result = CoinflipVsResults.EnemyWon;
+                request.Result = DonationResult.ReceiverDoesntExist;
                 return Ok(request);
             }
 
             if (donator.Points < request.Points)
             {
-                request.Challenger = donator;
-                request.Enemy = receiver;
-                request.Result = CoinflipVsResults.ChallengerNoPoints;
+                request.Donator = donator;
+                request.Receiver = receiver;
+                request.Result = DonationResult.DonatorNoMoney;
                 return Ok(request);
             }
 
-            request.Result = CoinflipVsResults.ChallengerWon;
+            request.Result = DonationResult.DonationSuccesful;
             donator.Points -= request.Points;
             receiver.Points += request.Points;
             _database.Context.SaveChanges();
 
-            request.Challenger = donator;
-            request.Enemy = receiver;
+            request.Donator = donator;
+            request.Receiver = receiver;
 
             return Ok(request);
         }

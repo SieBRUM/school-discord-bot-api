@@ -26,6 +26,7 @@ namespace DiscordBotAPI.Models
 
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Coinflip> Coinflips { get; set; }
+        public virtual DbSet<Jackpot> Jackpot { get; set; }
 
         // Returns current DBContext
         public virtual DbContext Context

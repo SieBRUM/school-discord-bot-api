@@ -21,6 +21,7 @@ namespace TNSApi.Mapping
         ChallengeAlreadyExists,
         ChallengeRequestSet,
         ChallengeDoesntExist,
+        ChallengeDeclined,
         UnknownError
     }
 

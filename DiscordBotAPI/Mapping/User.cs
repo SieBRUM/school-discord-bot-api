@@ -14,5 +14,11 @@ namespace DiscordBotAPI.Mapping
         public long DiscordId { get; set; }
         [Required]
         public long Points { get; set; }
+        [Required]
+        public long BetsExecuted { get; set; }
+        [Required]
+        public long BetsWon { get; set; }
+        [Required]
+        public long BetsLost { get; set; }
     }
 }
