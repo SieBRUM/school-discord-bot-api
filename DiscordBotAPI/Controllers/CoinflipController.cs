@@ -82,7 +82,6 @@ namespace DiscordBotAPI.Controllers
 
             if (existingCoinFlip != null)
             {
-                // Error
                 existingCoinFlip.Result = CoinflipVsResults.ChallengeAlreadyExists;
                 existingCoinFlip.Challenger = challenger;
                 existingCoinFlip.Enemy = enemy;
@@ -91,7 +90,6 @@ namespace DiscordBotAPI.Controllers
 
             if (challenger.Points < coinflip.Points)
             {
-                // Error
                 coinflip.Result = CoinflipVsResults.ChallengerNoPoints;
                 return Ok(coinflip);
             }
