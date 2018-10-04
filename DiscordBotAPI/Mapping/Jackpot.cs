@@ -22,7 +22,7 @@ namespace TNSApi.Mapping
         public long Points { get; set; }
 
         [NotMapped]
-        public decimal WinChancePercentage { get; set; }
+        public double WinChancePercentage { get; set; }
         [NotMapped]
         public long TotalPoints { get; set; }
         [NotMapped]

@@ -58,8 +58,10 @@ namespace DiscordBotAPI.Controllers
         {
             var donator = _database.Users.Where(x => x.DiscordId == request.Donator.DiscordId).FirstOrDefault();
             var receiver = _database.Users.Where(x => x.DiscordId == request.Receiver.DiscordId).FirstOrDefault();
+            donator.Username = request.Donator.Username;
+            receiver.Username = request.Receiver.Username;
 
-            if(donator == null)
+            if (donator == null)
             {
                 request.Result = DonationResult.DonatorDoesntExist;
                 return Ok(request);
@@ -94,6 +96,7 @@ namespace DiscordBotAPI.Controllers
         public IHttpActionResult SetUser([FromBody]User frontendUser)
         {
             var user = _database.Users.Where(x => x.DiscordId == frontendUser.DiscordId).FirstOrDefault();
+            user.Username = frontendUser.Username;
 
             if (user == null)
             {

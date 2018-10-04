@@ -20,5 +20,6 @@ namespace DiscordBotAPI.Mapping
         public long BetsWon { get; set; }
         [Required]
         public long BetsLost { get; set; }
+        public string Username { get; set; }
     }
 }

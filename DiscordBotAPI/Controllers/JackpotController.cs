@@ -2,6 +2,8 @@
 using DiscordBotAPI.Services;
 using System.Linq;
 using TNSApi.Mapping;
+using System;
+using System.Collections.Generic;
 
 namespace TNSApi.Controllers
 {
@@ -14,14 +16,15 @@ namespace TNSApi.Controllers
             _database = database;
         }
 
-        [Route("api/gamble/startjackpot")]
+        [Route("api/gamble/updatejackpot")]
         [HttpPost]
-        public IHttpActionResult CreateJackpot(Jackpot jackpot)
+        public IHttpActionResult UpdateJackpot(Jackpot jackpot)
         {
             if(jackpot.Points < 1)
             {
                 // Error
                 jackpot.Status = JackpotStatus.InvalidPoints;
+                return Ok(jackpot);
             }
 
             var user = _database.Users.Where(x => x.DiscordId == jackpot.DiscordId).FirstOrDefault();
@@ -29,35 +32,68 @@ namespace TNSApi.Controllers
             {
                 // Error
                 jackpot.Status = JackpotStatus.UserDoesntExist;
+                return Ok(jackpot);
             }
 
             if (jackpot.Points > user.Points)
             {
                 // Error
                 jackpot.Status = JackpotStatus.UserNotEnoughPoints;
+                return Ok(jackpot);
             }
 
-            if(_database.Jackpot.Any())
+            var allJackpots = _database.Jackpot.ToList();
+            long totalPoints = jackpot.Points;
+            for (int i = 0; i < allJackpots.Count; i++)
             {
-                jackpot.Status = JackpotStatus.JackpotAlreadyExists;
+                totalPoints += allJackpots[i].Points;
             }
 
+            var existingJackpot = _database.Jackpot.Where(x => x.UserId == user.Id).FirstOrDefault();
+            // New
+            if(existingJackpot == null)
+            {
+                jackpot.UserId = user.Id;
+                _database.Jackpot.Add(jackpot);
+                _database.Context.SaveChanges();
+                jackpot.WinChancePercentage = (double)jackpot.Points / totalPoints * 100.00F;
+                jackpot.TotalPoints = totalPoints;
 
-            _database.Jackpot.Add(jackpot);
-            return Ok();
+                return Ok(jackpot);
+            }
+            // Existing
+            else
+            {
+                existingJackpot.Points += jackpot.Points;
+                existingJackpot.UserId = user.Id;
+                existingJackpot.WinChancePercentage = (double)existingJackpot.Points / totalPoints * 100.00;
+                existingJackpot.TotalPoints = totalPoints;
+                _database.Context.SaveChanges();
+
+                return Ok(existingJackpot);
+            }
         }
 
-        [Route("api/gamble/endjackpackpot")]
-        [HttpPost]
-        public IHttpActionResult EndJackpot(Jackpot jackpot)
+        [Route("api/gamble/endjackpot")]
+        [HttpGet]
+        public IHttpActionResult EndJackpot()
         {
-            return Ok();
-        }
+            var jackpots = _database.Jackpot.OrderByDescending(x => x.Points).ToList();
+            Dictionary<int, long> keyValuePairs = new Dictionary<int, long>();
 
-        [Route("api/gamble/addtojackpot")]
-        [HttpPost]
-        public IHttpActionResult AddToJackpot(Jackpot jackpot)
-        {
+            for (int i = 0; i < jackpots.Count(); i++)
+            {
+                if (i == 0)
+                    keyValuePairs.Add(jackpots[i].Id, jackpots[i].Points);
+                else
+                    keyValuePairs.Add(jackpots[i].Id, jackpots[i - 1].Points + jackpots[i].Points);
+            }
+
+            Random random = new Random();
+            int randomNumber = random.Next(0, (int)keyValuePairs.Last().Value + 1);
+
+            _database.Jackpot.RemoveRange(_database.Jackpot);
+            _database.Context.SaveChanges();
             return Ok();
         }
     }

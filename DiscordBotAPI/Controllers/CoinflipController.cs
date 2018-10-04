@@ -20,6 +20,7 @@ namespace DiscordBotAPI.Controllers
         public IHttpActionResult FlipCoin([FromBody]CoinflipResult coinflipUser)
         {
             var user = _database.Users.Where(x => x.DiscordId == coinflipUser.User.DiscordId).FirstOrDefault();
+            user.Username = coinflipUser.User.Username;
             CoinflipResult result = new CoinflipResult();
 
             if(user == null)
@@ -66,9 +67,12 @@ namespace DiscordBotAPI.Controllers
         public IHttpActionResult FlipCoinBattle([FromBody]Coinflip coinflip)
         {
             var challenger = _database.Users.Where(x => x.DiscordId == coinflip.Challenger.DiscordId).FirstOrDefault();
+            challenger.Username = coinflip.Challenger.Username;
             var enemy = _database.Users.Where(x => x.DiscordId == coinflip.Enemy.DiscordId).FirstOrDefault();
+            enemy.Username = coinflip.Enemy.Username;
 
-            if(challenger == null || enemy == null)
+
+            if (challenger == null || enemy == null)
             {
                 return BadRequest();
             }
@@ -113,7 +117,9 @@ namespace DiscordBotAPI.Controllers
         public IHttpActionResult AcceptCoinflip([FromBody]Coinflip coinflip)
         {
             var challenger = _database.Users.Where(x => x.DiscordId == coinflip.Challenger.DiscordId).FirstOrDefault();
+            challenger.Username = coinflip.Challenger.Username;
             var enemy = _database.Users.Where(x => x.DiscordId == coinflip.Enemy.DiscordId).FirstOrDefault();
+            enemy.Username = coinflip.Enemy.Username;
 
             if (challenger == null || enemy == null)
             {
@@ -191,7 +197,9 @@ namespace DiscordBotAPI.Controllers
         public IHttpActionResult DeclineCoinflip([FromBody]Coinflip coinflip)
         {
             var challenger = _database.Users.Where(x => x.DiscordId == coinflip.Challenger.DiscordId).FirstOrDefault();
+            challenger.Username = coinflip.Challenger.Username;
             var enemy = _database.Users.Where(x => x.DiscordId == coinflip.Enemy.DiscordId).FirstOrDefault();
+            enemy.Username = coinflip.Enemy.Username;
 
             if (challenger == null || enemy == null)
             {
