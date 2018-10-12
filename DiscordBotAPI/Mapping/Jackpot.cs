@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DiscordBotAPI.Mapping;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TNSApi.Mapping
@@ -29,5 +30,7 @@ namespace TNSApi.Mapping
         public long DiscordId { get; set; }
         [NotMapped]
         public JackpotStatus Status { get; set; }
+        [NotMapped]
+        public User User { get; set; }
     }
 }
